@@ -1,22 +1,81 @@
-import Post from "../models/post-model"
+import Post from "../models/post-model.js"
 
 export const store = async (req, res) => {
     try {
-        const content = await Post.crete(req.body)
+        const {text} = req.body
+        const user = req.user._id
+
+        const content = await Post.crete({
+            text,
+            user
+        })
         res.status(201).json(content)
     } catch (error) {
-        res.status(400).send(error)
+        res.status(500).send(error)
     }
 }
 
 export const index = async (req, res) => {
     try {
-        const content = await Post.find ({
-            rentedBy: undefined,
-        }).exec()
-
+        const filter = {
+            user: {
+                $in: req.user.following
+              
+        },
+    }
+        const content = await Post.find.exec()
         res.json(content)
     } catch (error) {
-        res.status(400).send(error)
+        res.status(500).send(error.message)
+    }
+}
+
+export const show = async (req, res) => {
+    try {
+        const content = await Post.findById(req.params.id).exec() 
+        res.json(content)
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+}
+
+export const update = async (req, res) => {
+    try {
+       user = req.user._id
+       const { text } = req.body
+       const content = await Post.findOneByAndUpdate (
+          {
+            _id: req.params.id,
+            user,
+          },
+          { text }
+        ).exec();
+
+        if (content) {
+            res.json(content)
+        } else {
+            res.sendStatus(403)
+        }
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+}
+
+export const destroy = async (req, res) => {
+    try {
+        const user = req.user._id;
+        const content = await Post.findOneByAndDelete ({
+            _id: req.params.id,
+            user
+        }).exec()
+
+        if(content) {
+            res.json(content)
+        } else {
+            res.sendStatus(403)
+        }
+       
+    } catch (error) {
+        res.status(500).send(error.message)
     }
 }
