@@ -92,7 +92,7 @@ export const destroy = async (req, res) => {
 export const followUnfollow = async (req,res) => {
     try {
         if(!req.user.following.includes(req.params.id)){ //se eu nao estou seguindo vou seguir tal usuario
-            res.user.following.push(req.params.id)
+            req.user.following.push(req.params.id)
         } else {
             const index = req.user.following.indexOf(req.params.id)
             req.user.following.splice(index,1)
