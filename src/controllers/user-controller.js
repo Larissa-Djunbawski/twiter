@@ -42,13 +42,7 @@ export const login = async (req, res) => {
 
 export const store = async (req, res) => {
     try {
-        const {text} = req.body
-        const user = req.user._id
-
-        const content = await Post.crete({
-            text,
-            user
-        })
+        const content = await User.create(req.body)
         res.status(201).json(content)
     } catch (error) {
         res.status(500).send(error)
@@ -57,7 +51,7 @@ export const store = async (req, res) => {
 
 export const index = async (req, res) => {
     try {
-        const content = await Post.find.exec()
+        const content = await User.find.exec()
         res.json(content)
     } catch (error) {
         res.status(500).send(error.message)
@@ -66,7 +60,7 @@ export const index = async (req, res) => {
 
 export const show = async (req, res) => {
     try {
-        const content = await Post.findById(req.params.id).exec() 
+        const content = await User.findById(req.params.id).exec() 
         res.json(content)
     } catch (error) {
         res.status(500).send(error.message)
@@ -75,21 +69,12 @@ export const show = async (req, res) => {
 
 export const update = async (req, res) => {
     try {
-       user = req.user._id
-       const { text } = req.body
-       const content = await Post.findOneByAndUpdate (
-          {
-            _id: req.params.id,
-            user,
-          },
-          { text }
-        ).exec();
-
-        if (content) {
-            res.json(content)
-        } else {
-            res.sendStatus(403)
-        }
+      const content = await User.findByIdAndUpdate(
+      req.params.id,
+      req.body
+    ).exec()
+       res.json(content)
+       
     } catch (error) {
         res.status(500).send(error.message)
     }
@@ -97,15 +82,8 @@ export const update = async (req, res) => {
 
 export const destroy = async (req, res) => {
     try {
-        const user = req.user._id;
-        const content = await Post.findOneByAndDelete (req.params.id).exec()
-
-        if(content) {
-            res.json(content)
-        } else {
-            res.sendStatus(403)
-        }
-       
+    const content = await User.findByIdAndDelete(req.params.id).exec()
+       res.json(content)
     } catch (error) {
         res.status(500).send(error.message)
     }
@@ -116,9 +94,11 @@ export const followUnfollow = async (req,res) => {
         if(!req.user.following.includes(req.params.id)){ //se eu nao estou seguindo vou seguir tal usuario
             res.user.following.push(req.params.id)
         } else {
-            const index = req.user.following.indexOf(req.)
+            const index = req.user.following.indexOf(req.params.id)
             req.user.following.splice(index,1)
         }
+        await req.user.save()
+        res.json()
 
     } catch (error) {
          res.status(400).send(error.message)

@@ -1,6 +1,7 @@
 import {Router} from "express"
 import { signup, login, destroy, index, show, store, update, followUnfollow} from "../controllers/user-controller.js"
 import authorizer from "../middlewares/authorizer.js"
+import jwtAuthenticator from "../middlewares/jwt-authenticator.js"
 
 
 const router = Router()
@@ -11,7 +12,7 @@ router.post("/login", login) //longin, onde se cria um token(post)
 router.use(jwtAuthenticator)
 
 router.put("/follow-unfollow/:id",followUnfollow) //rota para seguidores
-router.delete("/unfollow/:id",unfollow)
+router.delete("/followUnfollow/:id",followUnfollow)
 router.use(authorizer(["ADMINISTRADOR", "SUPORT"]))
 
 
